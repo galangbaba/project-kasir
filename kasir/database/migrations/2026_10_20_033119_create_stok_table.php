@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stoks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('produk_id')->constrained('produks')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('jenis');
             $table->integer('jumlah_diubah');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stok');
+        Schema::dropIfExists('stoks');
     }
 };

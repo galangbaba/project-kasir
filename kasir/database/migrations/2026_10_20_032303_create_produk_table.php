@@ -15,11 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('nama');
-            // Menggunakan DECIMAL untuk nilai uang dan stok agar presisi
             $table->decimal('harga', 12, 2);
             $table->integer('stock')->default(0);
             $table->boolean('aktif')->default(true);
-            $table->timestamps();
             $table->timestamps();
         });
     }
