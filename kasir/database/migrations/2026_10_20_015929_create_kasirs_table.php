@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('kasirs', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('menu');
+            $table->string('nama_kasir');
+            $table->string('username')->unique();
+            $table->string('password');
             $table->timestamps();
         });
     }

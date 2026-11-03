@@ -9,4 +9,10 @@ Route::get('/', function () {
 
 // Route::get('/index', [KasirController::class, 'index']);
 
-Route::get('/dashboard', [KasirController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [KasirController::class, 'dashboard'])->name('dashboard');
+
+Route::get('/kasir', [KasirController::class, 'kasir'])->name('kasir.kasir');
+
+Route::get('/menu', [KasirController::class, 'menu'])->name('menu.menu');
+
+Route::get('/transaksi', [KasirController::class, 'transaksi'])->name('transaksi.transaksi');
