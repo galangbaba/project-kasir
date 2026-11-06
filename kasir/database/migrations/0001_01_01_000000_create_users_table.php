@@ -6,27 +6,38 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        // Tenants (ERD: Tenants) — satu unit usaha / client
+        Schema::create('tenants', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_tenants', 100);
+            $table->string('kategori_usaha', 60)->nullable();
+            $table->string('penanggung_jawab', 100);
+            $table->string('status', 15)->default('aktif'); // aktif|nonaktif
+            $table->unsignedInteger('trx_counter')->default(0); // penomoran TRX per tenant
+            $table->timestamps();
+            $table->index('status');
+        });
+
+        // User (ERD: User) — super_admin | admin_tenant | kasir
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->restrictOnDelete();
+            $table->string('nama', 100);
+            $table->string('email', 150)->nullable()->unique();
+            $table->string('username', 50)->unique();
+            $table->string('password', 64); // MD5 (32 hex) — sesuai permintaan
+            $table->string('role', 20);     // super_admin|admin_tenant|kasir
+            $table->string('status', 15)->default('aktif');
+            $table->unsignedTinyInteger('failed_attempts')->default(0);
+            $table->timestamp('locked_until')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
+            $table->index(['tenant_id', 'role']);
         });
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
+        // Tabel sesi bawaan Laravel (CSRF + flash)
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();
@@ -37,13 +48,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('tenants');
     }
 };
