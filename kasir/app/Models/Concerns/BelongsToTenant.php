@@ -3,28 +3,34 @@
 namespace App\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Isolasi tenant (SRS: "Tenant A tidak dapat mengakses data Tenant B").
- * Untuk pengguna yang punya tenant_id, SETIAP query otomatis dibatasi ke tenant-nya,
- * tenant_id diambil dari sesi terautentikasi di server — bukan dari masukan klien.
- */
 trait BelongsToTenant
 {
     protected static function bootBelongsToTenant(): void
     {
+        // Membatasi query berdasarkan tenant yang sedang login
         static::addGlobalScope('tenant', function (Builder $query) {
             $user = Auth::user();
-            if ($user && $user->tenant_id) {
-                $query->where($query->getModel()->getTable() . '.tenant_id', $user->tenant_id);
+
+            if ($user !== null && $user->tenant_id !== null) {
+                $table = $query->getModel()->getTable();
+
+                $query->where(
+                    $table . '.tenant_id',
+                    '=',
+                    $user->tenant_id
+                );
             }
         });
 
-        static::creating(function ($model) {
+        // Mengisi tenant_id otomatis saat membuat data baru
+        static::creating(function (Model $model) {
             $user = Auth::user();
-            if ($user && $user->tenant_id) {
-                $model->tenant_id = $user->tenant_id; // paksa, abaikan nilai dari luar
+
+            if ($user !== null && $user->tenant_id !== null) {
+                $model->tenant_id = $user->tenant_id;
             }
         });
     }

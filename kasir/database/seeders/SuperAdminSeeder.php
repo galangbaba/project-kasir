@@ -16,9 +16,41 @@ class SuperAdminSeeder extends Seeder
             [
                 'tenant_id' => null,
                 'nama' => 'Super Admin',
-                'email' => 'admin@kantin.test', 
+                'email' => 'admin@kantin.test',
                 'password' => Md5Password::make('123'), // PASSWORD SANGAT SIMPEL: 123
                 'role' => 'super_admin',
+                'status' => 'aktif',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        // data tenants
+        $tenatId = DB::table('tenats')->updateOrInsert(
+            ['nama_tenant' => 'Kantin sejahtera'],
+            [
+                'nama_tenat' => 'Kantin sejahtera',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+
+        // ambil ID tenant
+        $tenantId = DB::table('tenants')
+        ->where('nama_tenant', 'Kantin sejahtera')
+        ->value('id');
+
+
+        // membuat akun admin tenant
+        DB::table('users')->updateOrInsert(
+            ['username' => 'admin_tenant'], // Patokan pengecekan
+            [
+                'tenant_id' => $tenantId,
+                'nama' => 'Admin Tenant',
+                'email' => 'admin@test.test',
+                'password' => Md5Password::make('123'),
+                'role' => 'tenant_admin',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now(),
